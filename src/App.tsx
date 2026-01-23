@@ -1,19 +1,8 @@
-import { useState } from "react";
+import GameBoard from "./GameBoard/GameBoard";
 import "./App.css";
 
 function App() {
-	const [count, setCount] = useState(0);
-
-	const onClickSample = () => {
-		setCount((prev) => prev + 1);
-	};
-
-	return (
-		<>
-			<p>Hello {count}</p>
-			<button onClick={onClickSample}> Click ME </button>
-		</>
-	);
+	return <GameBoard />;
 }
 
 export default App;
