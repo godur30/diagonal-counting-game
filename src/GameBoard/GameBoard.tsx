@@ -32,6 +32,11 @@ const GameBoard = () => {
 	// Define Internal State for last cell placed
 	const [lastCellPlaced, setLastCellPlaced] = useState<number[]>([-1, -1]);
 
+	// This should help w undo functionality Jaden!!
+	const [secondLastCellPlaced, setSecondLastCellPlaced] = useState<number[]>([
+		-1, -1
+	]);
+
 	// Define Internal State for which "level" is active
 	const [activeLevel /*setActiveLevel*/] = useState<1 | 2>(1);
 
@@ -52,6 +57,7 @@ const GameBoard = () => {
 			return prev;
 		});
 		setNextToPlace((prev) => prev + 1);
+		setSecondLastCellPlaced(lastCellPlaced);
 		setLastCellPlaced([r, c]);
 	}
 
@@ -101,6 +107,9 @@ const GameBoard = () => {
 			</div>
 			<p className="helperText">
 				{`Last Cell (debugging): ${lastCellPlaced}`}
+			</p>
+			<p className="helperText">
+				{`2nd Last Cell (debugging): ${secondLastCellPlaced}`}
 			</p>
 		</div>
 	);
