@@ -1,3 +1,20 @@
+import successSfx from "../assets/placementSuccess.mp3";
+import failureSfx from "../assets/placementFail.mp3";
+
+// Create audio objects for each sfx
+const successAudio = new Audio(successSfx);
+const failAudio = new Audio(failureSfx);
+
+export function playSuccess() {
+	successAudio.currentTime = 0;
+	successAudio.play();
+}
+
+export function playFail() {
+	failAudio.currentTime = 0;
+	failAudio.play();
+}
+
 // Define arrays to hold incides of blue and gold cells
 const goldCells = [0, 6, 42, 48];
 const blueCells = [

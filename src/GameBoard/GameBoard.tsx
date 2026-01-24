@@ -1,7 +1,7 @@
 import "./GameBoard.css";
 import SingleCell from "../SingleCell/SingleCell";
 import ToolbarButton from "../ToolbarButton/ToolbarButton";
-import { getCellType } from "./helpers";
+import { getCellType, playSuccess, playFail } from "./helpers";
 import { useState } from "react";
 import testImage from "../assets/testImage.jpg";
 
@@ -51,6 +51,7 @@ const GameBoard = () => {
 	// Define function for handling error, which, for now, is blank
 	function handleError(msg: string): void {
 		setErrorMsg(msg);
+		playFail();
 	}
 
 	// Define function for processing a move in lvl 1 - accepts row column coordinates and cell type positionally
@@ -73,6 +74,7 @@ const GameBoard = () => {
 			setNextToPlace((prev) => prev + 1);
 			setSecondLastCellPlaced(lastCellPlaced);
 			setLastCellPlaced([r, c]);
+			playSuccess();
 			return;
 		}
 
@@ -116,6 +118,7 @@ const GameBoard = () => {
 			setMatrix((prevMatrix) =>
 				prevMatrix.map((row) => row.map((v) => (v === -1 ? 0 : v)))
 			);
+			playSuccess();
 			return;
 		}
 
@@ -123,6 +126,7 @@ const GameBoard = () => {
 		setSecondLastCellPlaced(lastCellPlaced);
 		setLastCellPlaced([r, c]);
 		setErrorMsg(null);
+		playSuccess();
 	}
 
 	// Define function for processing a move in lvl2 - accepts row column coordinates positionally
