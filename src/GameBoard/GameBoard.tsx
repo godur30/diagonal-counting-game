@@ -4,6 +4,7 @@ import ToolbarButton from "../ToolbarButton/ToolbarButton";
 import { getCellType, playSuccess, playFail } from "./helpers";
 import { useState } from "react";
 import downloadImg from "../assets/downloadImg.svg";
+import uploadImg from "../assets/uploadImg.svg";
 
 // GameBoard instance - renders collection of SingleCells
 const GameBoard = () => {
@@ -69,6 +70,50 @@ const GameBoard = () => {
 		a.href = url;
 		a.download = `snapshot-${now}.json`;
 		a.click();
+	}
+
+	// Function for loading saved game state from client computer
+	function loadGame(): void {
+		// Create DOM instance of input to manipulate
+		const input = document.createElement("input");
+
+		// Configure input instance
+		input.type = "file";
+		input.accept = ".json";
+
+		// Specify onChange handler which grabs state and loads it
+		input.onchange = () => {
+			// Get file
+			const file = input.files?.[0];
+			// Do nothing if no file is selected
+			if (!file) return;
+
+			// Instantiate filereader
+			const reader = new FileReader();
+
+			// Define onLoad function that loads state from json
+			reader.onload = () => {
+				// Use try catch for error handling
+				try {
+					const parsed = JSON.parse(reader.result as string);
+
+					setMatrix(parsed.matrix);
+					setNextToPlace(parsed.nextToPlace);
+					setLastCellPlaced(parsed.lastCellPlaced);
+					setSecondLastCellPlaced(parsed.secondLastCellPlaced);
+					setActiveLevel(parsed.activeLevel);
+					setScore(parsed.score);
+					setErrorMsg(parsed.errorMsg);
+				} catch {
+					setErrorMsg("Selected File is Invalid.");
+				}
+			};
+
+			reader.readAsText(file);
+		};
+
+		// Initialize file input diolog
+		input.click();
 	}
 
 	// Define function for handling error, which, for now, is blank
@@ -169,9 +214,10 @@ const GameBoard = () => {
 					icon={downloadImg}
 				/>
 				<ToolbarButton
-					label="bar"
-					onClick={() => console.log("bar")}
+					label="Load Game"
+					onClick={() => loadGame()}
 					bgColor="purple"
+					icon={uploadImg}
 				/>
 			</div>
 			<p className="helperText">Current Level: {activeLevel}</p>
