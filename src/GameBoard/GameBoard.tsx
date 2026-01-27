@@ -206,6 +206,11 @@ const GameBoard = () => {
 				matrix[lastCellPlacement[0]][lastCellPlacement[1]] = 0;
 				setMatrix(matrix);
 				setNextToPlace((prev) => prev - 1);
+
+				const secondLastCellPlacement = cellPlacementHistory.at(-1);
+				if (secondLastCellPlacement && Math.abs(lastCellPlacement[0] - secondLastCellPlacement[0]) == 1 && Math.abs(lastCellPlacement[1] - secondLastCellPlacement[1]) == 1) {
+					setScore((prev) => prev - 1);
+				}
 			}
 		} else {
 			handleError("Cannot undo when the last placed number is 1.");
@@ -224,6 +229,7 @@ const GameBoard = () => {
 		matrix[firstCellPlacement[0]][firstCellPlacement[1]] = 1;
 		setMatrix(matrix);
 		setNextToPlace(2);
+		setScore(0);
 	}
 
 	// Return Grid of SingleCells, passing corresponding matrix value to each
