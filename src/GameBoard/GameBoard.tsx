@@ -193,7 +193,7 @@ const GameBoard = () => {
 	// Define function for processing a move in lvl2 - accepts row column coordinates positionally
 	function processLvl2Move(r: number, c: number, cellType: string): void {
 		// error on trying to place in previous level
-		if (cellType == 'grey') {
+		if (cellType == "grey") {
 			handleError("Cannot place in level 1.");
 			return;
 		}
@@ -206,18 +206,33 @@ const GameBoard = () => {
 
 		// get the position in level 1 of the number to be placed in level 2
 		// sr/c = source row/column
-		const sr = cellPlacementHistory[nextToPlace - 1][0]
-		const sc = cellPlacementHistory[nextToPlace - 1][1]
+		const sr = cellPlacementHistory[nextToPlace - 1][0];
+		const sc = cellPlacementHistory[nextToPlace - 1][1];
 
-		console.log(`sr: ${sr}`);
-		console.log(`sc: ${sc}`);
-		console.log(`r: ${r}`);
-		console.log(`c: ${c}`);
+		// console.log(`sr: ${sr}`);
+		// console.log(`sc: ${sc}`);
+		// console.log(`r: ${r}`);
+		// console.log(`c: ${c}`);
 
-		console.log("Checking non-diags");
-		console.log([[sr, 0], [0, sc], [sr, 6], [6, sc]].some(([a, b]) => a === r && b === c));
+		// console.log("Checking non-diags");
+		// console.log(
+		// 	[
+		// 		[sr, 0],
+		// 		[0, sc],
+		// 		[sr, 6],
+		// 		[6, sc]
+		// 	].some(([a, b]) => a === r && b === c)
+		// );
+
 		// check validity of placement for non-diagonals
-		if ([[sr, 0], [0, sc], [sr, 6], [6, sc]].some(([a, b]) => a === r && b === c)) {
+		if (
+			[
+				[sr, 0],
+				[0, sc],
+				[sr, 6],
+				[6, sc]
+			].some(([a, b]) => a === r && b === c)
+		) {
 			setMatrix((prev) => {
 				prev[r][c] = nextToPlace;
 				return prev;
@@ -229,10 +244,35 @@ const GameBoard = () => {
 			return;
 		}
 
-		console.log("Checking diags1");
-		console.log([[1, 1], [2, 2], [3, 3], [4, 4], [5, 5]].some(([a, b]) => a === sr && b === sc) && [[0, 0], [6, 6]].some(([a, b]) => a === r && b === c));
+		// console.log("Checking diags1");
+		// console.log(
+		// 	[
+		// 		[1, 1],
+		// 		[2, 2],
+		// 		[3, 3],
+		// 		[4, 4],
+		// 		[5, 5]
+		// 	].some(([a, b]) => a === sr && b === sc) &&
+		// 		[
+		// 			[0, 0],
+		// 			[6, 6]
+		// 		].some(([a, b]) => a === r && b === c)
+		// );
+
 		// check validity of placement for diagonals and center
-		if ([[1, 1], [2, 2], [3, 3], [4, 4], [5, 5]].some(([a, b]) => a === sr && b === sc) && [[0, 0], [6, 6]].some(([a, b]) => a === r && b === c)) {
+		if (
+			[
+				[1, 1],
+				[2, 2],
+				[3, 3],
+				[4, 4],
+				[5, 5]
+			].some(([a, b]) => a === sr && b === sc) &&
+			[
+				[0, 0],
+				[6, 6]
+			].some(([a, b]) => a === r && b === c)
+		) {
 			setMatrix((prev) => {
 				prev[r][c] = nextToPlace;
 				return prev;
@@ -244,9 +284,34 @@ const GameBoard = () => {
 			return;
 		}
 
-		console.log("Checking diags2");
-		console.log([[5, 1], [4, 2], [3, 3], [2, 4], [1, 5]].some(([a, b]) => a === sr && b === sc) && [[6, 0], [0, 6]].some(([a, b]) => a === r && b === c))
-		if ([[5, 1], [4, 2], [3, 3], [2, 4], [1, 5]].some(([a, b]) => a === sr && b === sc) && [[6, 0], [0, 6]].some(([a, b]) => a === r && b === c)) {
+		// console.log("Checking diags2");
+		// console.log(
+		// 	[
+		// 		[5, 1],
+		// 		[4, 2],
+		// 		[3, 3],
+		// 		[2, 4],
+		// 		[1, 5]
+		// 	].some(([a, b]) => a === sr && b === sc) &&
+		// 		[
+		// 			[6, 0],
+		// 			[0, 6]
+		// 		].some(([a, b]) => a === r && b === c)
+		// );
+
+		if (
+			[
+				[5, 1],
+				[4, 2],
+				[3, 3],
+				[2, 4],
+				[1, 5]
+			].some(([a, b]) => a === sr && b === sc) &&
+			[
+				[6, 0],
+				[0, 6]
+			].some(([a, b]) => a === r && b === c)
+		) {
 			setMatrix((prev) => {
 				prev[r][c] = nextToPlace;
 				return prev;
@@ -258,7 +323,7 @@ const GameBoard = () => {
 			return;
 		}
 
-		handleError("Invalid placement.");
+		handleError("Lvl 2 placements must relate to lvl 1 placements.");
 	}
 
 	// Define function for undoing a cell placement. Deny undos when next to place is 1.
@@ -273,7 +338,15 @@ const GameBoard = () => {
 				setNextToPlace((prev) => prev - 1);
 
 				const secondLastCellPlacement = cellPlacementHistory.at(-1);
-				if (secondLastCellPlacement && Math.abs(lastCellPlacement[0] - secondLastCellPlacement[0]) == 1 && Math.abs(lastCellPlacement[1] - secondLastCellPlacement[1]) == 1) {
+				if (
+					secondLastCellPlacement &&
+					Math.abs(
+						lastCellPlacement[0] - secondLastCellPlacement[0]
+					) == 1 &&
+					Math.abs(
+						lastCellPlacement[1] - secondLastCellPlacement[1]
+					) == 1
+				) {
 					setScore((prev) => prev - 1);
 				}
 			}
@@ -363,12 +436,14 @@ const GameBoard = () => {
 					})
 				)}
 			</div>
+			{/*
 			<p className="helperText">
 				{`Last Cell (debugging): ${cellPlacementHistory[cellPlacementHistory.length - 1]}`}
 			</p>
 			<p className="helperText">
 				{`2nd Last Cell (debugging): ${cellPlacementHistory[cellPlacementHistory.length - 2]}`}
 			</p>
+			 */}
 			<p
 				className={`errorText ${errorMsg ? "" : "hidden"}`}>{`Error: ${errorMsg}`}</p>
 		</div>
