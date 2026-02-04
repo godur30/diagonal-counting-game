@@ -389,8 +389,7 @@ const GameBoard = () => {
 					bgColor="purple"
 					icon={uploadImg}
 				/>
-			</div>
-			<div className="horizontalParent">
+
 				<ToolbarButton
 					label="Undo"
 					onClick={undoCellPlacement}
@@ -404,40 +403,47 @@ const GameBoard = () => {
 					icon={resetImg}
 				/>
 			</div>
-			<p className="helperText">Current Level: {activeLevel}</p>
-			<p className="helperText">Current Score is: {score}</p>
-			<p className="helperText">Next Number to Place is: {nextToPlace}</p>
-			<div className="grid7x7">
-				{matrix.map((row, rowCount) =>
-					row.map((cellValue, cellCount) => {
-						const currLoop = rowCount * 7 + cellCount;
-						return (
-							<SingleCell
-								value={cellValue}
-								cellType={getCellType(currLoop)}
-								row={rowCount}
-								column={cellCount}
-								onClick={
-									activeLevel == 1
-										? processLvl1Move
-										: processLvl2Move
-								}
-								selected={
-									cellPlacementHistory.length > 0 &&
-									rowCount ==
-										cellPlacementHistory[
-											cellPlacementHistory.length - 1
-										][0] &&
-									cellCount ==
-										cellPlacementHistory[
-											cellPlacementHistory.length - 1
-										][1]
-								}
-							/>
-						);
-					})
-				)}
+			<div className="horizontalParent">
+				<div className="grid7x7">
+					{matrix.map((row, rowCount) =>
+						row.map((cellValue, cellCount) => {
+							const currLoop = rowCount * 7 + cellCount;
+							return (
+								<SingleCell
+									value={cellValue}
+									cellType={getCellType(currLoop)}
+									row={rowCount}
+									column={cellCount}
+									onClick={
+										activeLevel == 1
+											? processLvl1Move
+											: processLvl2Move
+									}
+									selected={
+										cellPlacementHistory.length > 0 &&
+										rowCount ==
+											cellPlacementHistory[
+												cellPlacementHistory.length - 1
+											][0] &&
+										cellCount ==
+											cellPlacementHistory[
+												cellPlacementHistory.length - 1
+											][1]
+									}
+								/>
+							);
+						})
+					)}
+				</div>
+				<div className="verticalParent">
+					<p className="helperText">Current Level: {activeLevel}</p>
+					<p className="helperText">Current Score is: {score}</p>
+					<p className="helperText">
+						Next Number to Place is: {nextToPlace}
+					</p>
+				</div>
 			</div>
+
 			{/*
 			<p className="helperText">
 				{`Last Cell (debugging): ${cellPlacementHistory[cellPlacementHistory.length - 1]}`}
