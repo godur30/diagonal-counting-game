@@ -6,7 +6,8 @@ import {
 	playSuccess,
 	playFail,
 	getRandomInteger,
-	playVictory
+	playVictory,
+	deepCopyMatrix
 } from "./helpers";
 import { useState } from "react";
 import downloadImg from "../assets/downloadImg.svg";
@@ -27,13 +28,14 @@ const GameBoard = () => {
 		[-1, -1, -1, -1, -1, -1, -1]
 	];
 
-	// Place "1" randomly in inner circle
+	// Place "1" randomly in inner circle in DEEP COPY TO AVOID DUPLICATE 1 PLACEMENT
 	const randomX = getRandomInteger(1, 5);
 	const randomY = getRandomInteger(1, 5);
 
-	initialMatrix[randomX][randomY] = 1;
+	const tempCopy = deepCopyMatrix(initialMatrix);
+	tempCopy[randomX][randomY] = 1;
 
-	const [matrix, setMatrix] = useState<number[][]>(initialMatrix);
+	const [matrix, setMatrix] = useState<number[][]>(tempCopy);
 
 	// Define State for NextToPlace
 	const [nextToPlace, setNextToPlace] = useState<number>(2);
@@ -226,7 +228,7 @@ const GameBoard = () => {
 	}
 
 	// Define function for processing a move in lvl2 - accepts row column coordinates positionally
-	function processLvl2Move(r: number, c: number, cellType: string): void {		
+	function processLvl2Move(r: number, c: number, cellType: string): void {
 		// error on trying to place in previous level
 		if (cellType == "grey") {
 			handleError("Cannot place in level 1.");

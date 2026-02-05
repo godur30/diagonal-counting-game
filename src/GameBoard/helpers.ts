@@ -1,6 +1,6 @@
 import successSfx from "../assets/placementSuccess.mp3";
 import failureSfx from "../assets/placementFail.mp3";
-import victorySfx from "../assets/victory.mp3"
+import victorySfx from "../assets/victory.mp3";
 
 // Create audio objects for each sfx
 const successAudio = new Audio(successSfx);
@@ -43,3 +43,6 @@ export function getCellType(loop: number): "grey" | "blue" | "gold" {
 	}
 	return "grey";
 }
+// Boilerplate to deep copy a matrix for temporary augmentation
+export const deepCopyMatrix = (matrix: number[][]) =>
+	matrix.map((row) => [...row]);
