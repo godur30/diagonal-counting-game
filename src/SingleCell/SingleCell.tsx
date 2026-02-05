@@ -14,7 +14,7 @@ interface SingleCellProps {
 const SingleCell = (props: SingleCellProps) => {
 	return (
 		<div
-			className={`singleCell ${props.cellType} ${props.selected ? "selected" : ""}`}
+			className={`singleCell ${props.cellType} ${props.selected ? "selected" : ""} ${props.value == -1 ? "hidden" : ""}`}
 			onClick={() =>
 				props.onClick(props.row, props.column, props.cellType)
 			}>

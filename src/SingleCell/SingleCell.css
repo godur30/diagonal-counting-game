@@ -31,3 +31,7 @@
 	z-index: 3;
 	border: rgb(110, 232, 35) 2px dotted;
 }
+
+.hidden {
+	display: hidden;
+}
