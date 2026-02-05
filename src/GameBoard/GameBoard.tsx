@@ -28,7 +28,7 @@ const GameBoard = () => {
 
 	// Define Internal State for Cell Placement history
 	const [cellPlacementHistory, setCellPlacementHistory] = useState<
-		number[][]
+		{number: number, location: number[], pointsEarned: number}[]
 	>([]);
 
 	// Define Internal State for which "level" is active
@@ -137,16 +137,17 @@ const GameBoard = () => {
 				prev[r][c] = nextToPlace;
 				return prev;
 			});
+			setCellPlacementHistory([...cellPlacementHistory, {number: nextToPlace, location: [r, c], pointsEarned: 0}]);
 			setNextToPlace((prev) => prev + 1);
-			setCellPlacementHistory([...cellPlacementHistory, [r, c]]);
 			playSuccess();
 			return;
 		}
 
 		// Case where "2" through "25" is being placed
 		// Source coordinates of last placed cell
-		const lr = cellPlacementHistory[cellPlacementHistory.length - 1][0];
-		const lc = cellPlacementHistory[cellPlacementHistory.length - 1][1];
+		const lr = cellPlacementHistory[cellPlacementHistory.length - 1].location[0];
+		const lc = cellPlacementHistory[cellPlacementHistory.length - 1].location[1];
+		let pointsEarned = 0;
 
 		// Error on selecting non-adjacent cell
 		if (Math.abs(r - lr) > 1 || Math.abs(c - lc) > 1) {
@@ -164,6 +165,7 @@ const GameBoard = () => {
 
 		// Conditionally assign point
 		if (Math.abs(r - lr) == 1 && Math.abs(c - lc) == 1) {
+			pointsEarned++;
 			setScore((prev) => prev + 1);
 		}
 
@@ -175,9 +177,9 @@ const GameBoard = () => {
 
 		// Conditionally activate level 2
 		if (nextToPlace == 25) {
-			setNextToPlace(2);
 			setActiveLevel(2);
-			setCellPlacementHistory([...cellPlacementHistory, [r, c]]);
+			setCellPlacementHistory([...cellPlacementHistory, {number: nextToPlace, location: [r, c], pointsEarned: pointsEarned}]);
+			setNextToPlace(2);
 			// Clear "-1" from lvl 2 cells
 			setMatrix((prevMatrix) =>
 				prevMatrix.map((row) => row.map((v) => (v === -1 ? 0 : v)))
@@ -186,8 +188,8 @@ const GameBoard = () => {
 			return;
 		}
 
+		setCellPlacementHistory([...cellPlacementHistory, {number: nextToPlace, location: [r, c], pointsEarned: pointsEarned}]);
 		setNextToPlace((prev) => prev + 1);
-		setCellPlacementHistory([...cellPlacementHistory, [r, c]]);
 		setErrorMsg(null);
 		playSuccess();
 	}
@@ -201,15 +203,15 @@ const GameBoard = () => {
 		}
 
 		// error on trying to place in already filled cell
-		if (matrix[r][c] !== 0) {
+		if (matrix[r][c] > 0) {
 			handleError("Cannot place number in already filled cell.");
 			return;
 		}
 
 		// get the position in level 1 of the number to be placed in level 2
 		// sr/c = source row/column
-		const sr = cellPlacementHistory[nextToPlace - 1][0];
-		const sc = cellPlacementHistory[nextToPlace - 1][1];
+		const sr = cellPlacementHistory[nextToPlace - 1].location[0];
+		const sc = cellPlacementHistory[nextToPlace - 1].location[1];
 
 		// console.log(`sr: ${sr}`);
 		// console.log(`sc: ${sc}`);
@@ -239,8 +241,8 @@ const GameBoard = () => {
 				prev[r][c] = nextToPlace;
 				return prev;
 			});
+			setCellPlacementHistory([...cellPlacementHistory, {number: nextToPlace, location: [r, c], pointsEarned: 0}]);
 			setNextToPlace((prev) => prev + 1);
-			setCellPlacementHistory([...cellPlacementHistory, [r, c]]);
 			setErrorMsg(null);
 			playSuccess();
 			return;
@@ -279,8 +281,8 @@ const GameBoard = () => {
 				prev[r][c] = nextToPlace;
 				return prev;
 			});
+			setCellPlacementHistory([...cellPlacementHistory, {number: nextToPlace, location: [r, c], pointsEarned: 0}]);
 			setNextToPlace((prev) => prev + 1);
-			setCellPlacementHistory([...cellPlacementHistory, [r, c]]);
 			setErrorMsg(null);
 			playSuccess();
 			return;
@@ -318,8 +320,8 @@ const GameBoard = () => {
 				prev[r][c] = nextToPlace;
 				return prev;
 			});
+			setCellPlacementHistory([...cellPlacementHistory, {number: nextToPlace, location: [r, c], pointsEarned: 0}]);
 			setNextToPlace((prev) => prev + 1);
-			setCellPlacementHistory([...cellPlacementHistory, [r, c]]);
 			setErrorMsg(null);
 			playSuccess();
 			return;
@@ -330,47 +332,56 @@ const GameBoard = () => {
 
 	// Define function for undoing a cell placement. Deny undos when next to place is 1.
 	function undoCellPlacement() {
-		if (nextToPlace > 2) {
-			const lastCellPlacement = cellPlacementHistory.pop();
-			if (lastCellPlacement) {
-				// Mutating state is OK since it is being referenced by setter right after
-				// eslint-disable-next-line
-				matrix[lastCellPlacement[0]][lastCellPlacement[1]] = 0;
-				setMatrix(matrix);
-				setNextToPlace((prev) => prev - 1);
+		if (activeLevel == 1 && nextToPlace <= 2) {
+			handleError("Cannot undo from the start of the game.");
+			return;
+		} else if (activeLevel == 2 && nextToPlace <= 2) {
+			handleError("Cannot undo from Level 2 to Level 1.");
+			return;
+		}
 
-				const secondLastCellPlacement = cellPlacementHistory.at(-1);
-				if (
-					secondLastCellPlacement &&
-					Math.abs(
-						lastCellPlacement[0] - secondLastCellPlacement[0]
-					) == 1 &&
-					Math.abs(
-						lastCellPlacement[1] - secondLastCellPlacement[1]
-					) == 1
-				) {
-					setScore((prev) => prev - 1);
-				}
+		const lastCellPlacement = cellPlacementHistory.pop();
+		if (lastCellPlacement) {
+			const newMatrix = [...matrix];
+			newMatrix[lastCellPlacement.location[0]][lastCellPlacement.location[1]] = 0;
+			setMatrix(newMatrix);
+			setNextToPlace((prev) => prev - 1);
+
+			if (lastCellPlacement.pointsEarned > 0) {
+				setScore((prev) => prev - lastCellPlacement.pointsEarned);
 			}
-		} else {
-			handleError("Cannot undo when the last placed number is 1.");
 		}
 	}
 
 	// Define function for clearing the board, keeping only the 1's placement.
 	function clearBoard() {
-		const firstCellPlacement = cellPlacementHistory[0];
-		setCellPlacementHistory([firstCellPlacement]);
-		// Mutating state is OK since it is being referenced by setter right after
-		// eslint-disable-next-line
-		matrix.length = 0;
-		matrix.push(...initialMatrix);
-		// eslint-disable-next-line
-		matrix[firstCellPlacement[0]][firstCellPlacement[1]] = 1;
-		setMatrix(matrix);
+		if (activeLevel == 1 && nextToPlace <= 2) {
+			handleError("Cannot clear board from the start of the game.");
+			return;
+		} else if (activeLevel == 2 && nextToPlace <= 2) {
+			handleError("Cannot clear board from Level 2 to Level 1.");
+			return;
+		}
+
+		const newMatrix = [...initialMatrix];
+		let cellsSaved = 1;
+		let scoreSaved = 0;
+
+		if (activeLevel == 2) {
+			cellsSaved = 25;
+			newMatrix.forEach((row, i) => {newMatrix[i] = row.map((col) => (col === -1 ? 0 : col))});
+		}
+		
+		for (let i = 0; i < cellsSaved; i++) {
+			const cellPlacement = cellPlacementHistory[i];
+			newMatrix[cellPlacement.location[0]][cellPlacement.location[1]] = cellPlacement.number;
+			scoreSaved += cellPlacement.pointsEarned;
+		}
+
+		setCellPlacementHistory(cellPlacementHistory.slice(0, cellsSaved));
+		setMatrix(newMatrix);
 		setNextToPlace(2);
-		setActiveLevel(1);
-		setScore(0);
+		setScore(scoreSaved);
 	}
 
 	// Return Grid of SingleCells, passing corresponding matrix value to each
@@ -424,11 +435,11 @@ const GameBoard = () => {
 										rowCount ==
 											cellPlacementHistory[
 												cellPlacementHistory.length - 1
-											][0] &&
+											].location[0] &&
 										cellCount ==
 											cellPlacementHistory[
 												cellPlacementHistory.length - 1
-											][1]
+											].location[1]
 									}
 								/>
 							);
