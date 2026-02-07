@@ -54,7 +54,36 @@ const GameBoard = () => {
 	// Define Internal State for Error Messaging
 	const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+	//Define Internal State for Player Name
+	const [playerName, setPlayerName] = useState<string>("");
+
 	// PLACE METHODS HERE
+
+	//Function to log and save a completed level
+	function logCompletedLevel(
+		completedLevel: number,
+		completedMatrix: number[][],
+		finalScore: number
+	): void {
+		const logEntry = {
+			playerName: playerName.trim() || "Anonymous",
+			playDateTime: new Date().toISOString(),
+			level: completedLevel,
+			rewardsOrPoints: finalScore,
+			completedBoard: completedMatrix.map((row) => [...row]) // Deep copy of matrix
+		};
+
+		const jsonToSave = JSON.stringify(logEntry, null, 2);
+		const now = new Date().toISOString().replace(/[:.]/g, "-");
+		const blob = new Blob([jsonToSave], { type: "application/json" });
+		const url = URL.createObjectURL(blob);
+
+		const a = document.createElement("a");
+		a.href = url;
+		a.download = `game-log-level-${completedLevel}-${now}.json`;
+		a.click();
+		URL.revokeObjectURL(url); // Clean up the URL object
+	}
 
 	// Function to save jsonified game state to client computer
 	function saveGame(): void {
@@ -65,7 +94,8 @@ const GameBoard = () => {
 			cellPlacementHistory,
 			activeLevel,
 			score,
-			errorMsg
+			errorMsg,
+			playerName
 		};
 
 		// JSONify
@@ -116,6 +146,7 @@ const GameBoard = () => {
 					setActiveLevel(parsed.activeLevel);
 					setScore(parsed.score);
 					setErrorMsg(parsed.errorMsg);
+					setPlayerName(parsed.playerName);
 				} catch {
 					setErrorMsg("Selected File is Invalid.");
 				}
@@ -196,6 +227,11 @@ const GameBoard = () => {
 
 		// Conditionally activate level 2
 		if (nextToPlace == 25) {
+			//Log completed Level 1 before transitioning
+			const completedBoard = deepCopyMatrix(matrix);
+			completedBoard[r][c] = 25;
+			logCompletedLevel(1, completedBoard, score + pointsEarned);
+
 			setActiveLevel(2);
 			setCellPlacementHistory([
 				...cellPlacementHistory,
@@ -266,6 +302,10 @@ const GameBoard = () => {
 			setNextToPlace((prev) => prev + 1);
 			setErrorMsg(null);
 			if (nextToPlace == 25) {
+				//Log Completed Level 2
+				const completedBoard = deepCopyMatrix(matrix);
+				completedBoard[r][c] = 25;
+				logCompletedLevel(2, completedBoard, score);
 				playVictory();
 			} else {
 				playSuccess();
@@ -298,6 +338,10 @@ const GameBoard = () => {
 			setNextToPlace((prev) => prev + 1);
 			setErrorMsg(null);
 			if (nextToPlace == 25) {
+				//Log Completed Level 2
+				const completedBoard = deepCopyMatrix(matrix);
+				completedBoard[r][c] = 25;
+				logCompletedLevel(2, completedBoard, score);
 				playVictory();
 			} else {
 				playSuccess();
@@ -329,6 +373,10 @@ const GameBoard = () => {
 			setNextToPlace((prev) => prev + 1);
 			setErrorMsg(null);
 			if (nextToPlace == 25) {
+				//Log Completed Level 2
+				const completedBoard = deepCopyMatrix(matrix);
+				completedBoard[r][c] = 25;
+				logCompletedLevel(2, completedBoard, score);
 				playVictory();
 			} else {
 				playSuccess();
@@ -402,6 +450,20 @@ const GameBoard = () => {
 	// Return Grid of SingleCells, passing corresponding matrix value to each
 	return (
 		<div className="verticalParent">
+			{/* Player Name Input */}
+			<div className="horizontalParent">
+				<label className="playerNameLabel" htmlFor="playerName">
+					Player Name:
+				</label>
+				<input
+					id="playerName"
+					className='playerNameInput'
+					type="text"
+					placeholder="Enter your name"
+					value={playerName}
+					onChange={(e) => setPlayerName(e.target.value)}
+				/>
+			</div>
 			<div className="horizontalParent">
 				<ToolbarButton
 					label="Save Game"
