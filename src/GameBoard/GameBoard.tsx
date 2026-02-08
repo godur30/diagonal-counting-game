@@ -213,6 +213,13 @@ const GameBoard = () => {
 			return;
 		}
 
+		//Prompt player to enter the number
+		const enteredNumber = prompt("Enter the number to place:");
+		if (enteredNumber === null || parseInt(enteredNumber) !== nextToPlace) {
+			handleError(`Invalid number entered. Expected ${nextToPlace}.`);
+			return;
+		}
+
 		// Conditionally assign point
 		if (Math.abs(r - lr) == 1 && Math.abs(c - lc) == 1) {
 			pointsEarned++;
@@ -274,6 +281,13 @@ const GameBoard = () => {
 		// error on trying to place in already filled cell
 		if (matrix[r][c] > 0) {
 			handleError("Cannot place number in already filled cell.");
+			return;
+		}
+
+		//Prompt player to enter the number
+		const enteredNumber = prompt("Enter the number to place:");
+		if (enteredNumber === null || parseInt(enteredNumber) !== nextToPlace) {
+			handleError(`Invalid number entered. Expected ${nextToPlace}.`);
 			return;
 		}
 
